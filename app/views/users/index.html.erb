@@ -1,0 +1,17 @@
+<h2>Users</h2>
+
+<ul>
+  <% @users.each do |user| %>
+    <li>
+      <%= user.username %>
+      <% if Friendship.can_friend?(current_user.id, user.id)%>
+        <form action="/friendships" method="POST">
+          <input type="hidden"
+            name="friendship[in_friend_id]" value="<%= user.id %>">
+
+          <input type="submit" value="Add friend">
+        </form>
+      <% end %>
+    </li>
+  <% end %>
+</ul>
