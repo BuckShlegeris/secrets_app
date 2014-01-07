@@ -1,8 +1,35 @@
 <h1><%= @user.username %></h1>
 
 <h2>Secrets</h2>
-<ul>
+
+<ul class="secrets">
   <% @user.received_secrets.each do |secret| %>
     <li><%= secret.title %></li>
   <% end %>
 </ul>
+
+<label for="secret-text">Title</label>
+<input type="text" id="secret-text">
+<button class="secret-btn">Add secret</button>
+
+<script>
+$(".secret-btn").on("click", function (event) {
+  $.ajax({
+    type: "POST",
+    url: "/secrets",
+    data: {
+      secret: {
+        title: $("#secret-text").val(),
+        author_id: <%= current_user.id %>,
+        recipient_id: <%= @user.id %>
+      }
+    },
+    success: function () {
+      $(".secrets").append("<li>"+$("#secret-text").val()+"</li>")
+    }
+  });
+})
+
+</script>
+
+<%#= render partial: "secrets/form" %>

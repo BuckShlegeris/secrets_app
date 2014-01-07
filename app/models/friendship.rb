@@ -11,4 +11,8 @@ class Friendship < ActiveRecord::Base
                         :in_friend_id => in_friend_id) &&
       out_friend_id != in_friend_id
   end
+
+  def self.get_friendship(outf, inf)
+    Friendship.find_by_out_friend_id_and_in_friend_id(outf, inf)
+  end
 end

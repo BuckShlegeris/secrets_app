@@ -8,5 +8,7 @@ SecretShareAjax::Application.routes.draw do
 
   resources :friendships, :only => [:create]
 
+  post "friendships/delete", :to => "friendships#special_delete"
+
   root :to => "users#show"
 end

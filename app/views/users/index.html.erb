@@ -1,17 +1,76 @@
+
+
 <h2>Users</h2>
 
 <ul>
   <% @users.each do |user| %>
+    <% next if user == current_user %>
+
+    <% if Friendship.get_friendship(current_user.id, user.id) %>
+      <% class_name = "can-unfriend" %>
+    <% else %>
+      <% class_name = "can-friend" %>
+    <% end %>
+
     <li>
       <%= user.username %>
-      <% if Friendship.can_friend?(current_user.id, user.id)%>
-        <form action="/friendships" method="POST">
-          <input type="hidden"
-            name="friendship[in_friend_id]" value="<%= user.id %>">
-
-          <input type="submit" value="Add friend">
-        </form>
-      <% end %>
+      <div class="friend-buttons <%= class_name %>">
+        <button class="friend" data_id="<%= user.id %>">Add friend</button>
+        <button class="unfriend" data_id="<%= user.id %>">Remove friend</button>
+      </div>
     </li>
   <% end %>
 </ul>
+
+<script>
+  $(".friend").on("click", function(event) {
+    console.log($(this).attr("data_id"))
+
+    var button = this;
+
+    $(this).text("Friending...");
+    $(this).attr("disabled", "disabled");
+
+    $.ajax({
+      type: "POST",
+      url: "/friendships",
+      data: {
+        friendship: {
+          in_friend_id: $(button).attr("data_id"),
+          out_friend_id: <%= current_user.id %>
+        }
+      },
+      success: function (response) {
+        $(button).text("Add friend");
+        $(button).removeAttr("disabled");
+        console.log("success friend: "+button);
+        $(button).parent().toggleClass("can-friend can-unfriend");
+      }
+    })
+  });
+
+  $(".unfriend").on("click", function(event) {
+    console.log("unfriend"+$(this).attr("data_id"))
+
+    var button = this;
+
+    $(this).text("Unfriending...");
+    $(this).attr("disabled", "disabled");
+
+    $.ajax({
+      type: "POST",
+      url: "/friendships/delete",
+      data: {
+        in_friend_id: $(button).attr("data_id"),
+        out_friend_id: <%= current_user.id %>
+      },
+      success: function () {
+        $(button).text("Remove friend");
+        $(button).removeAttr("disabled");
+        console.log("success unfriend: "+button)
+        $(button).parent().toggleClass("can-friend can-unfriend");
+      }
+    })
+  });
+
+</script>
