@@ -13,3 +13,7 @@ User.create!(:username => "name2", :password => "password")
 User.create!(:username => "name3", :password => "password")
 User.create!(:username => "name4", :password => "password")
 User.create!(:username => "name5", :password => "password")
+
+Tag.create!(:name => "food")
+Tag.create!(:name => "military")
+Tag.create!(:name => "drugs")

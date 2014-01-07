@@ -10,25 +10,49 @@
 
 <label for="secret-text">Title</label>
 <input type="text" id="secret-text">
+
+<select class="tag-selector" name="select">
+</select>
+
 <button class="secret-btn">Add secret</button>
 
+<script type="application/json" id="bootstrapped_tags_json">
+  { "tags": <%= Tag.all.to_json.html_safe %> }
+</script>
+
+<script type="text/template" id="widgets_template">
+  <%% _(data["tags"]).each(function(tag) { %>
+    <option value="<%%= tag["name"] %>"><%%= tag["name"] %></option>
+  <%% }); %>
+</script>
+
 <script>
-$(".secret-btn").on("click", function (event) {
-  $.ajax({
-    type: "POST",
-    url: "/secrets",
-    data: {
-      secret: {
-        title: $("#secret-text").val(),
-        author_id: <%= current_user.id %>,
-        recipient_id: <%= @user.id %>
+  var data = JSON.parse($("#bootstrapped_tags_json").html());
+
+  var templateCode = $('#tags_template').html();
+  var templateFn = _.template(templateCode);
+  var renderedContent = templateFn(data);
+  console.log(renderedContent)
+  $(".tag-selector").html(renderedContent);
+
+  $(".secret-btn").on("click", function (event) {
+    var text = $("#secret-text").val();
+    $.ajax({
+      type: "POST",
+      url: "/secrets",
+      data: {
+        secret: {
+          title: $("#secret-text").val(),
+          author_id: <%= current_user.id %>,
+          recipient_id: <%= @user.id %>
+        }
+      },
+      success: function () {
+        $(".secrets").prepend("<li>"+text+"</li>")
       }
-    },
-    success: function () {
-      $(".secrets").append("<li>"+$("#secret-text").val()+"</li>")
-    }
-  });
-})
+    });
+    $("#secret-text").val('')
+  })
 
 </script>
 
